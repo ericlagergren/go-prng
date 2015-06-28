@@ -99,7 +99,7 @@ func (s *Shift116Plus) Next() uint64 {
 }
 
 func (s *Shift116Plus) Seed() {
-	copy(s.state[:], randUint(len(s.state)))
+	copy(s.state[:], randUint(cap(s.state)))
 }
 
 // Shift128Plus is the fastest generator passing BigCrush without
@@ -124,7 +124,7 @@ func (s *Shift128Plus) Next() uint64 {
 }
 
 func (s *Shift128Plus) Seed() {
-	copy(s.state[:], randUint(len(s.state)))
+	copy(s.state[:], randUint(cap(s.state)))
 }
 
 // Shift1024Star is a fast, top-quality generator. If 1024 bits of state are
@@ -150,7 +150,7 @@ func (s *Shift1024Star) Next() uint64 {
 }
 
 func (s *Shift1024Star) Seed() {
-	copy(s.state[:], fillWithXOR(len(s.state)))
+	copy(s.state[:], fillWithXOR(cap(s.state)))
 	s.p = 0
 }
 
@@ -177,7 +177,7 @@ func (s *Shift4096Star) Next() uint64 {
 }
 
 func (s *Shift4096Star) Seed() {
-	copy(s.state[:], fillWithXOR(len(s.state)))
+	copy(s.state[:], fillWithXOR(cap(s.state)))
 	s.p = 0
 }
 

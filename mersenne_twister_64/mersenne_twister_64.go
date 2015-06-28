@@ -33,7 +33,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package prng
+package twister64
 
 import "crypto/rand"
 
@@ -85,6 +85,16 @@ func Seed(seed int64) {
 	globalRand.Seed(seed)
 }
 
+// Warmup warms up the PRNG by running a 64-bit prime number of iterations.
+func Warmup() {
+	globalRand.Warmup()
+}
+
+// Int returns a random, non-negative int.
+func Int() int {
+	return globalRand.Int()
+}
+
 // Int64 generates a random number on [0, 2^64-1]-interval from the global
 // MT19937.
 func Int64() uint64 {
@@ -94,31 +104,31 @@ func Int64() uint64 {
 // Int63 generates a random number on [0, 2^63-1]-interval from the global
 // MT19937.
 func Int63() int64 {
-	return int64((globalRand.Int64() >> 1))
+	return globalRand.Int63()
 }
 
 // IntN generates a random number on [0, 2^64-1]-interval within
 // the given range, n, from the global MT19937.
 func IntN(n uint64) uint64 {
-	return globalRand.Int64() % n
+	return globalRand.IntN(n)
 }
 
 // Real1 generates a random number on [0,1]-real-interval from the global
 // MT19937.
 func Real1() float64 {
-	return float64(globalRand.Int64()>>11) * (1.0 / 9007199254740991.0)
+	return globalRand.Real1()
 }
 
 // Real2 generates a random number on [0,1)-real-interval from the global
 // MT19937.
 func Real2() float64 {
-	return float64(globalRand.Int64()>>11) * (1.0 / 9007199254740992.0)
+	return globalRand.Real2()
 }
 
 // Real3 generates a random number on (0,1)-real-interval from the global
 // MT19937.
 func Real3() float64 {
-	return (float64(globalRand.Int64()>>12) + 0.5) * (1.0 / 4503599627370496.0)
+	return globalRand.Real3()
 }
 
 // Seed seeds an MT19937 with the given seed.
@@ -166,6 +176,25 @@ func (m *MT19937) SeedArray(initKey [NN]uint64) {
 	}
 
 	m.mt[0] = 1 << 63 /* MSB is 1; assuring non-zero initial array */
+}
+
+// Warmup warms up the PRNG by running a 64-bit prime number of iterations.
+func (m *MT19937) Warmup() {
+	prime, err := rand.Prime(rand.Reader, 64)
+	if err != nil {
+		panic(err)
+	}
+	n := prime.Uint64()
+
+	for i := uint64(0); i < n; i++ {
+		m.Int64()
+	}
+}
+
+// Int returns a random, non-negative int.
+func (m *MT19937) Int() int {
+	u := uint(m.Int64())
+	return int(u << 1 >> 1)
 }
 
 // Int64 generates a random number on [0, 2^64-1]-interval.

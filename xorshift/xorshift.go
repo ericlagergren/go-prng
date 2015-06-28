@@ -27,24 +27,29 @@ type XORShift interface {
 // randUint reads from the OS' crypto PRNG and uses its output
 // to create a slice of uint64s with the given lenght, n.
 func randUint(n int) []uint64 {
-	bbuf := make([]byte, n*8)
 	s := make([]uint64, n)
 
-	n, err := io.ReadFull(rand.Reader, bbuf)
-	if err != nil {
-		panic(err)
-	}
-
-	if n != len(bbuf) {
-		panic("io.ReadFull didn't throw an error when it read less than len(buf) bytes!")
-	}
-
-	// Fill the array the user gave us.
-	for i, j := 0, 0; i < len(bbuf); i, j = i+8, j+1 {
-		s[j], _ = binary.Uvarint(bbuf[i:])
+	// Fill the array the user gave us but make sure there aren't any zeros.
+	for i := 0; i < n; i++ {
+		s[i] = randomNonZero()
 	}
 
 	return s
+}
+
+// randomNonZero fetches 8 bytes from the OS' CSPRNG and returns it as
+// a non-zero uint64. Will panic if it can't read from rand.Reader.
+func randomNonZero() uint64 {
+	buf := make([]byte, 8)
+	n, err := io.ReadFull(rand.Reader, buf)
+	if err != nil || n != 8 {
+		panic("Unable to fully read from rand.Reader")
+	}
+	u, x := binary.Uvarint(buf)
+	if u == 0 || x == 0 || x < 0 {
+		return randomNonZero()
+	}
+	return u
 }
 
 // fillWithXOR fills a slice using a xorshift64 generator, using a
@@ -106,7 +111,7 @@ func (s *Shift116Plus) Seed() {
 // systematic failures, but due to the relatively short period it is
 // acceptable only for applications with a mild amount of parallelism;
 // otherwise, use a xorshift1024* generator.
-
+//
 // The state must be seeded so that it is not everywhere zero. If you have
 // a nonzero 64-bit seed, we suggest to pass it twice through
 // MurmurHash3's avalanching function.

@@ -16,7 +16,7 @@ dirty XOR solution, and somehow ended up translating these PRNGs into Go.
 
 #### xorshift
 
-```
+```go
 import (
 	"fmt"
 	
@@ -32,7 +32,7 @@ func main() {
 
 ### mersennes twister
 
-```
+```go
 import (
 	"fmt"
 	
@@ -45,3 +45,17 @@ func main() {
 	fmt.Println(m.Int64())
 }
 ```
+
+## Documentation
+
+[godoc.org] [docs]
+
+## License
+
+It depends on the algorithm.
+
+[Apache 2.0] [license].
+
+
+[docs]:     https://godoc.org/github.com/EricLagerg/go-prng
+[license]:  https://github.com/EricLagerg/go-prng/blob/master/apache.txt

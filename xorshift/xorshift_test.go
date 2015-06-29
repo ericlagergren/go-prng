@@ -77,7 +77,6 @@ func TestShifts(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		defer stdin.Close()
 
 		file, err := os.Create(key)
 		if err != nil {
@@ -109,5 +108,6 @@ func TestShifts(t *testing.T) {
 		}
 
 		ch <- stop
+		stdin.Close()
 	}
 }

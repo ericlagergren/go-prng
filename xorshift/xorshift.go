@@ -16,9 +16,6 @@ import (
 	"io"
 )
 
-// Guarenteed to be fair using a dice roll.
-const randSeed = 16256612229375771919
-
 type XORShift interface {
 	Next() uint64
 	Seed()
@@ -50,18 +47,6 @@ func randomNonZero() uint64 {
 		return randomNonZero()
 	}
 	return u
-}
-
-// fillWithXOR fills a slice using a xorshift64 generator, using a
-// determined starting state (a large prime).
-func fillWithXOR(n int) []uint64 {
-	s := make([]uint64, n)
-	r := new(Shift64Star)
-	r.x = randSeed
-	for i := range s {
-		s[i] = r.Next()
-	}
-	return s
 }
 
 // genState generates a starting state using Go's 'crypto/rand'
@@ -155,7 +140,7 @@ func (s *Shift1024Star) Next() uint64 {
 }
 
 func (s *Shift1024Star) Seed() {
-	copy(s.state[:], fillWithXOR(cap(s.state)))
+	copy(s.state[:], randUint(cap(s.state)))
 	s.p = 0
 }
 
@@ -182,7 +167,7 @@ func (s *Shift4096Star) Next() uint64 {
 }
 
 func (s *Shift4096Star) Seed() {
-	copy(s.state[:], fillWithXOR(cap(s.state)))
+	copy(s.state[:], randUint(cap(s.state)))
 	s.p = 0
 }
 

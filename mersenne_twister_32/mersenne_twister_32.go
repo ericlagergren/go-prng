@@ -285,7 +285,21 @@ func (m *MT19937) Int() int {
 // IntN generates a random number on [0,0x7fffffff]-interval within
 // the given range, n.
 func (m *MT19937) IntN(n int) int {
-	return int(m.Int32() % uint32(n))
+	// See if n is out of bounds
+	if n <= 0 {
+		panic("invalid argument to IntN")
+	}
+	// Can shortcut Ns that are power of 2
+	if n <= 1<<31-1 {
+		return m.Int() & (n-1)
+	}
+	t := -n %n  // get the threshold
+	for {
+		r := m.Int()
+		if r&LMask >=t {
+			return r&Lmask %n
+		}
+	}
 }
 
 // Real1 generates a random number on [0,1]-real-interval from the given

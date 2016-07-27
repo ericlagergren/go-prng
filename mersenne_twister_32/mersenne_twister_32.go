@@ -273,7 +273,7 @@ func (m *MT19937) Int31() int32 {
 	y ^= (y << 15) & 0xefc60000
 	y ^= (y >> 18)
 
-	return int32(y >> 1)
+	return int32(y & LMask)
 }
 
 // Int returns a random, non-negative int.

@@ -243,7 +243,7 @@ func (m *MT19937) Int64() uint64 {
 // Int63 generates a random number on [0, 2^63-1]-interval from the given
 // MT19937.
 func (m *MT19937) Int63() int64 {
-	return int64((m.Int64() >> 1))
+	return int64((m.Int64() << 1 >> 1))
 }
 
 // IntN generates a random number on [0, 2^64-1]-interval within

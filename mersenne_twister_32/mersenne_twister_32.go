@@ -286,20 +286,19 @@ func (m *MT19937) Int() int {
 // the given range, n.
 func (m *MT19937) IntN(n int) int {
 	// See if n is out of bounds
-	if n <= 0 {
+	if n <= 0 || n > 1<<31-1 {
 		panic("invalid argument to IntN")
 	}
 	// Can shortcut Ns that are power of 2
-	if n <= 1<<31-1 {
-		return m.Int() & (n-1)
+	if n&(n-1) == 0 {
+		return m.Int() & (n - 1)
 	}
-	t := -n %n  // get the threshold
-	for {
-		r := m.Int()
-		if r&LMask >=t {
-			return r&Lmask %n
-		}
+	max := int32((1 << 31) - 1 - (1<<31)%uint32(n)) // calculate the max; reject anything >
+	r := m.Int()
+	for int32(r) > max {
+		r = m.Int()
 	}
+	return v % n
 }
 
 // Real1 generates a random number on [0,1]-real-interval from the given

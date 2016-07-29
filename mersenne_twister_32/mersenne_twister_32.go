@@ -298,7 +298,7 @@ func (m *MT19937) IntN(n int) int {
 	for int32(r) > max {
 		r = m.Int()
 	}
-	return v % n
+	return r % n
 }
 
 // Real1 generates a random number on [0,1]-real-interval from the given

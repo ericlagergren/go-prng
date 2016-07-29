@@ -249,7 +249,21 @@ func (m *MT19937) Int63() int64 {
 // IntN generates a random number on [0, 2^64-1]-interval within
 // the given range, n.
 func (m *MT19937) IntN(n uint64) uint64 {
-	return m.Int64() % n
+	// See if n is out of bounds
+	if n <= 0 {
+		panic("invalid argument to IntN")
+	}
+	// Can shortcut Ns that are power of 2
+	if n&(n-1) == 0 {
+		return m.Int64() & (n - 1)
+	}
+	t := -n % n // get the threshold
+	for {
+		r := m.Int64()
+		if r >= t {
+			return r % n
+		}
+	}
 }
 
 // Real1 generates a random number on [0,1]-real-interval from the given
